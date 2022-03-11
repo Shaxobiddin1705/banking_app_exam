@@ -1,8 +1,17 @@
+import 'package:banking_app_exam/models/card_model.dart';
 import 'package:banking_app_exam/pages/add_card_page.dart';
 import 'package:banking_app_exam/pages/cards_page.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async{
+  var connectivityResult = await (Connectivity().checkConnectivity());
+  if (connectivityResult == ConnectivityResult.mobile) {
+    isConnected = false;
+  } else if (connectivityResult == ConnectivityResult.wifi) {
+    isConnected = false;
+  }
+
   runApp(const MyApp());
 }
 

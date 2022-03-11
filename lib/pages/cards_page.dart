@@ -17,6 +17,9 @@ class CardsPage extends StatefulWidget {
 class _CardsPageState extends State<CardsPage> {
   bool isLoading = false;
   List<BankCard> cards = [];
+  List<Color> colors = [
+    Colors.blue, Colors.yellow, Colors.green, Colors.brown, Colors.indigoAccent, Colors.orange
+  ];
 
 
   void _apiPostList() {
@@ -44,6 +47,22 @@ class _CardsPageState extends State<CardsPage> {
       isLoading = false;
       if (response != null) {
         cards = Network.parseResponse(response);
+      }
+    });
+  }
+
+  void _apiDeletePost(BankCard card) {
+    setState(() {
+      cards.remove(card);
+    });
+    Network.DELETE(Network.API_DELETE + card.id, Network.paramsEmpty()).then((response) {
+      if(response != null) {
+        if (kDebugMode) {
+          print(response);
+        }
+        setState(() {
+          _apiPostList();
+        });
       }
     });
   }
@@ -96,73 +115,81 @@ class _CardsPageState extends State<CardsPage> {
                       shrinkWrap: true,
                       itemCount: cards.length,
                       itemBuilder: (context, index) {
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 25),
-                          height: 200,
-                          width: MediaQuery.of(context).size.width,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.grey
-                          ),
-                          child: Column(
-                            children: [
-
-                              const SizedBox(height: 15,),
-
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-
-                                    Image.asset('assets/images/grey_image.jpg', height: 35, width: 60, fit: BoxFit.cover,),
-
-                                    Text("VISA",style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),)
-
-                                  ],
-                                ),
+                        return Dismissible(
+                            key: Key(cards[index].cardNumber),
+                            child: Container(
+                              margin: const EdgeInsets.only(bottom: 25),
+                              height: 200,
+                              width: MediaQuery.of(context).size.width,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: colors[index]
                               ),
+                              child: Column(
+                                children: [
 
-                              const SizedBox(height: 25,),
+                                  const SizedBox(height: 15,),
 
-                              Center(
-                                child: Text(cards[index].cardNumber, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24),),
-                              ),
-
-                              const SizedBox(height: 30,),
-
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        const Text("CARD HOLDER", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10),),
 
-                                        const SizedBox(height: 5,),
+                                        Image.asset('assets/images/grey_image.jpg', height: 35, width: 60, fit: BoxFit.cover,),
 
-                                        Text(cards[index].cardHolder, style: const TextStyle(color: Colors.white, fontSize: 18),),
+                                        const Text("VISA",style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),)
+
                                       ],
                                     ),
+                                  ),
 
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                  const SizedBox(height: 25,),
+
+                                  Center(
+                                    child: Text(cards[index].cardNumber, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24),),
+                                  ),
+
+                                  const SizedBox(height: 30,),
+
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        const Text("EXPIRES", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10),),
 
-                                        const SizedBox(height: 5,),
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const Text("CARD HOLDER", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10),),
 
-                                        Text(cards[index].expiredDate, style: const TextStyle(color: Colors.white, fontSize: 18),),
+                                            const SizedBox(height: 5,),
+
+                                            Text(cards[index].cardHolder, style: const TextStyle(color: Colors.white, fontSize: 18),),
+                                          ],
+                                        ),
+
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const Text("EXPIRES", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10),),
+
+                                            const SizedBox(height: 5,),
+
+                                            Text(cards[index].expiredDate, style: const TextStyle(color: Colors.white, fontSize: 18),),
+                                          ],
+                                        ),
                                       ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                            onDismissed: (_) {
+                              setState(() {
+                                _apiDeletePost(cards[index]);
+                              });
+                            },
                         );
                       }
                   ),

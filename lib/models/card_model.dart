@@ -5,8 +5,11 @@ List<BankCard> imagesFromJson(String str) => List<BankCard>.from(json.decode(str
 
 String imagesToJson(List<BankCard> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
+bool isConnected = false;
+
 class BankCard{
 
+  late String id;
   late String cardNumber;
   late String cardHolder;
   late String expiredDate;
@@ -19,6 +22,7 @@ class BankCard{
     cardHolder = json['cardHolder'];
     expiredDate = json['expiredDate'].toString();
     cvv2 = json['cvv2'].toString();
+    id = json['id'].toString();
   }
 
   Map<String, dynamic> toJson() {
